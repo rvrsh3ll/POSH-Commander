@@ -18,7 +18,7 @@ class Metasploit3 < Msf::Post
       },
       'License'       	=> BSD_LICENSE,
       'Platform'      	=> [ 'win' ],
-      'SessionTypes'  	=> [ 'shell', 'meterpreter' ],
+      'SessionTypes'  	=> [ 'meterpreter' ],
       'Author'			=> [
           'Steve Borosh',	# @424f424f
           ],
