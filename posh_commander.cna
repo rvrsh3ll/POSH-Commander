@@ -171,6 +171,8 @@ sub veilPowerUp {
 
 sub customScript {
 	global('$command $scriptUrl');
+	$console = console();
+	$console = open_console_tab("meterpreter $sid");
 	$scriptUrl = prompt_text("URL to your script");
 	$command = prompt_text("Script command + arguments");
 	sendCommand();
