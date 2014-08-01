@@ -44,6 +44,8 @@ sub veilPowerView {
 		
 		@commands = @(
 			%(commands => "Get-ShuffledArray"),
+			%(commands => "Get-ComputerProperties"),
+			%(commands => "Invoke-ComputerFieldSearch"),
 			%(commands => "Get-HostIP"),
 			%(commands => "Test-Server"),
 			%(commands => "Get-NetDomain"),
