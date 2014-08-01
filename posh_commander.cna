@@ -95,17 +95,19 @@ sub veilPowerView {
 						$command = "$2";
 				}
 				
-					else if ($1 eq "Cancel") {
-								return;
-					}
-								
-				sendCommand();				
-					
-					on tab_close {
-							quit();
-					}
 		}	
+		
+		else if ($1 eq "Cancel") {
+						return;
+		}
+								
+		sendCommand();				
+				
 	}
+	
+	on tab_close {
+					quit();
+			}
 }
 
 sub veilPowerUp {
@@ -152,23 +154,25 @@ sub veilPowerUp {
 					$args = "$setargs";
 					$command = "$2 $args";
 				}
-				
+								
 				else if ($argsprompt eq "1") {
 						$args = $null;
 						$command = "$2";
 				}
-											
-					else if ($1 eq "Cancel") {
-								return;
-					}
-								
-				sendCommand();				
-					
-						on tab_close {
-									quit();
-						}
+				
 		}	
+		
+		else if ($1 eq "Cancel") {
+						return;
+		}
+								
+		sendCommand();				
+				
 	}
+	
+	on tab_close {
+					quit();
+			}
 }
 
 sub customScript {
@@ -192,3 +196,4 @@ sub sendCommand {
 		cmd($console, "run -j");
 
 }
+
