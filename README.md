@@ -13,3 +13,4 @@ Created by: rvrsh3ll
 
 Veil Project: https://github.com/Veil-Framework/
 PowerView and PowerUp blog by harmj0y: http://blog.harmj0y.net/
+Misc. Powershell Commands: http://ss64.com/ps/
