@@ -46,7 +46,7 @@ sub veilPowerView {
 		global('$console @commands $args $argsprompt $command $scriptUrl');
 		$console = console();
 		$console = open_console_tab("meterpreter $sid");
-		$scriptUrl = prompt_text("URL to the PowerView script", "http://bit.ly/1ABN58S");
+		$scriptUrl = prompt_text("URL to the PowerView script", "http://bit.ly/142Nmad");
 		
 		
 		@commands = @(
@@ -121,7 +121,7 @@ sub veilPowerUp {
 		global('$console @commands $args $argsprompt $command $vpvuri $scriptUrl');
 		$console = console();
 		$console = open_console_tab("meterpreter $sid");
-		$scriptUrl = prompt_text("URL to the PowerUp script", "http://bit.ly/1AFWjAZ");
+		$scriptUrl = prompt_text("URL to the PowerUp script", "http://bit.ly/1DQsDGn");
 		
 				
 		
